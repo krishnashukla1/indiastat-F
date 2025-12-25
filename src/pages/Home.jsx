@@ -315,7 +315,8 @@
 import { useState, useEffect } from 'react'; // Add these imports
 import { Link } from "react-router-dom";
 import { Database, Calendar, ChevronRight, ArrowRight } from "lucide-react";
-import axios from 'axios'; // Import Axios
+import API from "../api/axios";
+
 
 // Keep your categories array as-is (it's already dynamic-friendly)
 const categories = [
@@ -334,21 +335,46 @@ export default function Home() {
   const [loading, setLoading] = useState(true); // Optional: For loading spinner
   const [error, setError] = useState(null); // Optional: For error handling
 
-  useEffect(() => {
-    const fetchFeatured = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/datasets/featured');
-        setFeaturedDatasets(response.data); // Set the fetched data
-      } catch (err) {
-        setError('Failed to load featured datasets. Please try again.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchFeatured = async () => {
+  //     try {
+  //       // const response = await axios.get('http://localhost:5000/api/datasets/featured');
+  //               const response = await API.get("/datasets/featured"); 
+  //       setFeaturedDatasets(response.data); // Set the fetched data
+  //     } catch (err) {
+  //       setError('Failed to load featured datasets. Please try again.');
+  //       console.error(err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchFeatured();
-  }, []); // Empty array: Runs only once on mount
+  //   fetchFeatured();
+  // }, []); // Empty array: Runs only once on mount
+
+
+useEffect(() => {
+  const fetchFeatured = async () => {
+    try {
+      const response = await API.get("/datasets/featured");
+
+      const datasets = Array.isArray(response.data)
+        ? response.data
+        : response.data.data;
+
+      setFeaturedDatasets(datasets);
+    } catch (err) {
+      setError("Failed to load featured datasets. Please try again.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchFeatured();
+}, []);
+
+
 
   return (
     <div className="container mx-auto p-6 space-y-12">
